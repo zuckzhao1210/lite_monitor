@@ -1,0 +1,12 @@
+# 数据库配置
+database:
+  host: localhost               # 数据库主机地址（必填）
+  port: 3306                    # 数据库端口号（必填）
+  username: lite_monitor        # 数据库用户名（必填）
+  password: lite_monitor        # 数据库密码（必填）
+  database_name: lite_monitor   # 数据库名称（必填）
+
+# 监控数据保存时间
+retention:
+  history_retention_days: 14      # 历史数据留存时间（默认值：14天）
+  trend_retention_days: 3         # 趋势数据留存时间（默认值：3个月）
