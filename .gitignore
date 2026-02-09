@@ -1,4 +1,8 @@
 .vscode
 .marscode
 
+build/
+install/
+logs/
+
 output/

@@ -1,0 +1,13 @@
+server:
+  ip: 127.0.0.1
+  port: 8080
+  
+# 配置shell脚本指标
+monitor_cmd:
+  - item: cpu_usage
+    cmd: "top -bn1 | grep \"Cpu(s)\" | awk '{print $2 + $4}' | cut -d. -f1"
+    interval: 10
+  
+  - item: mem_usage
+    cmd: "free | grep Mem | awk '{print $3/$2 * 100.0}' | cut -d. -f1"
+    interval: 10

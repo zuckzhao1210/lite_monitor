@@ -10,3 +10,20 @@ database:
 retention:
   history_retention_days: 14      # 历史数据留存时间（默认值：14天）
   trend_retention_days: 3         # 趋势数据留存时间（默认值：3个月）
+
+# 日志参数
+log:
+  log_dir: ./logs                # 日志文件目录（默认值：./logs）
+  log_level: info                # 日志级别（默认值：info）
+  max_log_file_size: 100         # 最大日志文件大小（MB）（默认值：100MB）
+  max_log_file_num: 10           # 最大日志文件数量（默认值：10个）
+
+# HTTP服务器参数
+http_server:
+  host: localhost               # HTTP服务器主机地址（默认值：localhost）
+  port: 20317                    # HTTP服务器端口号（默认值：20317）
+
+# 接收监控数据接口
+tcp_server:
+  host: localhost               # TCP服务器主机地址（默认值：localhost）
+  port: 21210                    # TCP服务器端口号（默认值：21210）
