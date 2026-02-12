@@ -69,6 +69,31 @@ std::shared_ptr<MYSQL_RES> DBConnection::query(const std::string &sql)
     return res_ptr;
 }
 
+template <typename T>
+bool DBConnection::batchInsert(const std::string &sql, const std::vector<T> &records)
+{
+    if (!isConnected())
+    {
+        return false;
+    }
+    MYSQL_STMT *stmt = mysql_stmt_init(mysql_);
+    const char *sql_cstr = sql.c_str();
+    if (mysql_stmt_prepare(stmt, sql_cstr, sql.size()) != 0)
+    {
+        mysql_stmt_close(stmt);
+        return false;
+    }
+
+    // 绑定参数
+    MYSQL_BIND bind[T::field_count];
+    if (mysql_stmt_bind_param(stmt, bind) != 0)
+    {
+        mysql_stmt_close(stmt);
+        return false;
+    }
+
+}
+
 MYSQL *DBConnection::raw()
 {
     return mysql_;
@@ -95,8 +120,8 @@ DBConnectionPool::DBConnectionPool(const DBConfig &db_config) : db_config_(db_co
 DBConnectionPool::~DBConnectionPool()
 {
     {
-    std::unique_lock<std::mutex> lock(pool_mutex_);
-    shutting_down_ = true;
+        std::unique_lock<std::mutex> lock(pool_mutex_);
+        shutting_down_ = true;
     }
     cv_.notify_all();
 
@@ -233,6 +258,29 @@ bool DBOperator::executeDB(const std::string &sql)
     catch (const std::exception &e)
     {
         spdlog::error("[DBOperator::executeDB] exec sql: {} \n error: {}", sql, e.what());
+        return false;
+    }
+}
+
+template <typename T> bool DBOperator::batchInsertDB(const std::string &sql, const std::vector<T> &records)
+{
+    if (!pool_)
+    {
+        spdlog::error("[DBOperator::batchInsertDB] pool is not initialized");
+        return false;
+    }
+    try
+    {
+        auto conn = pool_->getConnection();
+        if (!conn)
+        {
+            return false;
+        }
+        return conn->batchInsert(sql, records);
+    }
+    catch (const std::exception &e)
+    {
+        spdlog::error("[DBOperator::batchInsertDB] exec sql: {} \n error: {}", records.size(), e.what());
         return false;
     }
 }
