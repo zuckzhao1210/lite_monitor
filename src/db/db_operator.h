@@ -43,6 +43,8 @@ class DBConnection
     bool execute(const std::string &sql);
     std::shared_ptr<MYSQL_RES> query(const std::string &sql);
 
+    template <typename T> bool batchInsert(const std::string &sql, const std::vector<T> &records);
+
     MYSQL *raw();
 
   private:
@@ -97,6 +99,14 @@ class DBOperator
      * @return false 操作失败
      */
     bool executeDB(const std::string &sql);
+
+    /**
+     * @brief 批量执行插入
+     * @param obs 待插入对象列表
+     * @return true 操作成功
+     * @return false 操作失败
+     */
+    template <typename T> bool batchInsertDB(const std::string &sql, const std::vector<T> &records);
 
   private:
     explicit DBOperator(const DBConfig &db_config);
