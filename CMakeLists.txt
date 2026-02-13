@@ -15,6 +15,8 @@ endif()
 set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdpart)
 file(GLOB_RECURSE SRCS "src/*.cpp")
 
+add_subdirectory(src/core/housekeeper)
+
 # 包含头文件目录
 include_directories(include)
 

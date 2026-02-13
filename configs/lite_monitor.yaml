@@ -13,7 +13,7 @@ retention:
 
 # 日志参数
 log:
-  log_dir: ./logs                # 日志文件目录（默认值：./logs）
+  log_dir: ../logs                # 日志文件目录（默认值：./logs）
   log_level: info                # 日志级别（默认值：info）
   max_log_file_size: 100         # 最大日志文件大小（MB）（默认值：100MB）
   max_log_file_num: 10           # 最大日志文件数量（默认值：10个）
