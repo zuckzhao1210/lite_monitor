@@ -19,7 +19,7 @@
 #include <mutex>
 #include <vector>
 #include <condition_variable>
-#include "history.h"
+
 #pragma once
 
 class HistoryRingBuffer {

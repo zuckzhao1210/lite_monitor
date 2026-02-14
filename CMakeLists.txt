@@ -13,32 +13,23 @@ endif()
 
 # 定义相关路径
 set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdpart)
-file(GLOB_RECURSE SRCS "src/*.cpp")
 
 add_subdirectory(src/core/housekeeper)
-
-# 包含头文件目录
-include_directories(include)
-
-# 第三方库头文件
-include_directories(${THIRD_PARTY_DIR}/include)
-
-# 第三方库路径
-link_directories(${THIRD_PARTY_DIR}/lib)
-link_directories(${THIRD_PARTY_DIR}/lib/yaml-cpp)
-link_directories(${THIRD_PARTY_DIR}/lib/mysql)
+add_subdirectory(src/core/http)
+add_subdirectory(src/core/db)
+add_subdirectory(src/core/trapper)
 
 # 添加可执行文件
-add_executable(lite_monitor ${SRCS})
+add_executable(lite_monitor ${CMAKE_CURRENT_SOURCE_DIR}/src/lite_monitor.cpp)
 
-# 链接第三方库
-target_link_libraries(lite_monitor 
-    yaml-cpp 
-    pthread
-    mysqlclient
-    dl
-    ssl
-    crypto
+target_include_directories(lite_monitor PUBLIC
+    ${THIRD_PARTY_DIR}/include/spdlog
+    ${THIRD_PARTY_DIR}/include/yaml-cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(lite_monitor housekeeper http db trapper
+    ${THIRD_PARTY_DIR}/lib/yaml-cpp/libyaml-cpp.a
 )
 
 # 安装可执行文件
