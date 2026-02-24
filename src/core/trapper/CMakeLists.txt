@@ -1,5 +1,5 @@
 # 创建静态库
-add_library(trapper STATIC
+add_library(trapper SHARED
     tcp_server.cpp
 )
 

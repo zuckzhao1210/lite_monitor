@@ -1,11 +1,11 @@
 project(http)
 
-add_library(http STATIC
+add_library(http SHARED
     http_server.cpp
 )
 
 # 第三方库头文件
 target_include_directories(http PUBLIC 
-    ${THIRD_PARTY_DIR}/include/spdlog
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/thirdpart/include
 )

@@ -18,18 +18,33 @@ add_subdirectory(src/core/housekeeper)
 add_subdirectory(src/core/http)
 add_subdirectory(src/core/db)
 add_subdirectory(src/core/trapper)
+add_subdirectory(src/sender)
 
 # 添加可执行文件
-add_executable(lite_monitor ${CMAKE_CURRENT_SOURCE_DIR}/src/lite_monitor.cpp)
-
-target_include_directories(lite_monitor PUBLIC
-    ${THIRD_PARTY_DIR}/include/spdlog
-    ${THIRD_PARTY_DIR}/include/yaml-cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+add_executable(lite_monitor 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/lite_monitor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/utils/path_utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/config/configs_loader.cpp
 )
 
-target_link_libraries(lite_monitor housekeeper http db trapper
+target_include_directories(lite_monitor PUBLIC
+    ${THIRD_PARTY_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+# 修改后：ssl和crypto提前
+target_link_libraries(lite_monitor PRIVATE
+    housekeeper
+    http
+    db
+    trapper
+    ssl        
+    crypto     
+    pthread
+    dl
     ${THIRD_PARTY_DIR}/lib/yaml-cpp/libyaml-cpp.a
+    ${THIRD_PARTY_DIR}/lib/mysql/libmysqlclient.so
 )
 
 # 安装可执行文件
@@ -43,6 +58,15 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install" CACHE PATH "Standard Install Path" FORCE)
 endif()
 install(TARGETS lite_monitor DESTINATION bin)
+# 安装子模块库文件
+install(TARGETS 
+    housekeeper
+    http
+    trapper
+    sender
+    db
+    DESTINATION lib
+)
 install(DIRECTORY configs/ DESTINATION etc)
 install(DIRECTORY scripts/ 
         DESTINATION scripts

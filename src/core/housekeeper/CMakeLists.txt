@@ -3,7 +3,7 @@ project(housekeeper)
 # 包含头文件目录
 include_directories(include)
 
-add_library(housekeeper STATIC
+add_library(housekeeper SHARED
     keeper.cpp
     history_ring_buffer.cpp
     history_syncer.cpp

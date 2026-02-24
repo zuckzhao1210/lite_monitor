@@ -6,13 +6,15 @@
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include "google/protobuf/message.h"
 
-#include "utils/byteorder_utils.h"
-#include "utils/checksum_utils.h"
+// #include "utils/byteorder_utils.h"
+// #include "utils/checksum_utils.h"
 
 namespace lite_monitor
 {
 // 定义TCP消息格式
+template <typename MT>
 class Message
 {
   public:
@@ -20,7 +22,8 @@ class Message
     {
         C0 = 0xc0,
         C1 = 0xc1,
-        D1 = 0xd1
+        D1 = 0xd1,
+        D2 = 0xd2
     };
 
     Message() = default;
@@ -55,14 +58,15 @@ class Message
         return payload_;
     }
 
-    void setHostID(uint8_t host_id)
-    {
-        _host_id = host_id;
-    }
-    uint8_t getHostID() const
-    {
-        return _host_id;
-    }
+    // void setHostID(uint8_t host_id)
+    // {
+    //     _host_id = host_id;
+    // }
+    // uint8_t getHostID() const
+    // {
+    //     return _host_id;
+    // }
+
     void setMessageType(uint8_t message_type)
     {
         _message_type = message_type;
@@ -71,6 +75,7 @@ class Message
     {
         return _message_type;
     }
+
     void setMessageLen(uint32_t message_len)
     {
         _message_len = message_len;
@@ -99,18 +104,18 @@ class Message
         std::memcpy(ptr, &net_len, 2);
         ptr += 2;
 
-        *ptr = static_cast<char>(_host_id);
-        ptr += 1;
+        // *ptr = static_cast<char>(_host_id);
+        // ptr += 1;
 
         // 消息体
         std::memcpy(ptr, body_.data(), _message_len);
         ptr += _message_len;
 
-        // 计算CRC校验值，并且序列化
-        uint16_t crc = ChecksumUtils::crc16(payload_.data(), HEADER_LENGTH + _message_len);
-        uint16_t net_crc = ByteOrderUtils::hostToNet16(crc);
-        std::memcpy(ptr, &net_crc, 2);
-        return payload_;
+        // // 计算CRC校验值，并且序列化
+        // uint16_t crc = ChecksumUtils::crc16(payload_.data(), HEADER_LENGTH + _message_len);
+        // uint16_t net_crc = ByteOrderUtils::hostToNet16(crc);
+        // std::memcpy(ptr, &net_crc, 2);
+        // return payload_;
     }
 
     /**
@@ -133,8 +138,8 @@ class Message
         _message_len = ByteOrderUtils::netToHost16(net_len);
         ptr += 2;
 
-        _host_id = static_cast<uint8_t>(ptr[0]);
-        ptr += 1;
+        // _host_id = static_cast<uint8_t>(ptr[0]);
+        // ptr += 1;
 
         body_.clear();
         body_.reserve(_message_len);
@@ -147,17 +152,25 @@ class Message
         bodyDeserialize();
 
         // 验证 CRC
-        uint16_t expected_crc;
-        std::memcpy(&expected_crc, ptr, 2);
-        expected_crc = ByteOrderUtils::netToHost16(expected_crc);
-        if (!ChecksumUtils::verifyCRC(payload_.data(), HEADER_LENGTH + _message_len, expected_crc))
-        {
-            throw std::runtime_error("CRC verification failed");
-        }
-        else
-        {
-            _crc = expected_crc;
-        }
+        // uint16_t expected_crc;
+        // std::memcpy(&expected_crc, ptr, 2);
+        // expected_crc = ByteOrderUtils::netToHost16(expected_crc);
+        // if (!ChecksumUtils::verifyCRC(payload_.data(), HEADER_LENGTH + _message_len, expected_crc))
+        // {
+        //     throw std::runtime_error("CRC verification failed");
+        // }
+        // else
+        // {
+        //     _crc = expected_crc;
+        // }
+    }
+
+    /**
+     * @brief 解析proto消息体
+     */
+    bool parseBody() {
+        static_assert(std::is_base_of<google::protobuf::Message, MT>::value, "MT must be protobuf message");
+        return mt_.ParseFromString(body_);
     }
 
   protected:
@@ -175,11 +188,14 @@ class Message
     uint8_t _message_type;
     // 消息长度 4字节
     uint16_t _message_len;
-    // 主机 1字节
-    uint8_t _host_id;
 
-    // CRC校验 2字节
-    uint16_t _crc = 0;
+    MT mt_;
+
+    // // 主机 1字节
+    // uint8_t _host_id;
+
+    // // CRC校验 2字节
+    // uint16_t _crc = 0;
 
     std::string body_;
     std::string payload_;

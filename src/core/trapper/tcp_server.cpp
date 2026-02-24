@@ -198,6 +198,11 @@ class TcpServer
         std::cout << "Client closed fd=" << fd << std::endl;
     }
 
+    /**
+     * @brief  分帧，处理半包的情况
+     * 
+     * @param fd 连接文件描述符
+     */
     void processBuffer(int fd)
     {
         std::string &buffer = recv_buffers_[fd];
@@ -227,10 +232,10 @@ class TcpServer
             buffer.erase(0, tail + 1);
 
             // 去掉帧头帧尾
-            std::string payload = frame.substr(1, frame.size() - 2);
+            std::string data = frame.substr(1, frame.size() - 2);
 
             // 反转义
-            std::string data = unescape(payload);
+            // std::string data = unescape(payload);
 
             if (message_cb_)
             {
@@ -239,35 +244,35 @@ class TcpServer
         }
     }
 
-    static std::string unescape(const std::string &in)
-    {
-        std::string out;
-        out.reserve(in.size());
+    // static std::string unescape(const std::string &in)
+    // {
+    //     std::string out;
+    //     out.reserve(in.size());
 
-        for (std::size_t i = 0; i < in.size(); ++i)
-        {
-            unsigned char c = in[i];
-            if (c == 0x7D)
-            {
-                if (i + 1 >= in.size())
-                {
-                    break; // 异常转义，直接丢弃
-                }
-                unsigned char next = in[++i];
-                if (next == 0x00)
-                    out.push_back(0x7D);
-                else if (next == 0x01)
-                    out.push_back(0xAA);
-                else if (next == 0x02)
-                    out.push_back(0xFF);
-            }
-            else
-            {
-                out.push_back(c);
-            }
-        }
-        return out;
-    }
+    //     for (std::size_t i = 0; i < in.size(); ++i)
+    //     {
+    //         unsigned char c = in[i];
+    //         if (c == 0x7D)
+    //         {
+    //             if (i + 1 >= in.size())
+    //             {
+    //                 break; // 异常转义，直接丢弃
+    //             }
+    //             unsigned char next = in[++i];
+    //             if (next == 0x00)
+    //                 out.push_back(0x7D);
+    //             else if (next == 0x01)
+    //                 out.push_back(0xAA);
+    //             else if (next == 0x02)
+    //                 out.push_back(0xFF);
+    //         }
+    //         else
+    //         {
+    //             out.push_back(c);
+    //         }
+    //     }
+    //     return out;
+    // }
 };
 
 #endif // TCP_SERVER_H

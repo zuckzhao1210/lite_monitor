@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package lite_monitor;
+
+
+message ResponseMessage {
+    int32 id = 1;
+    bool success = 2;
+}
+
+

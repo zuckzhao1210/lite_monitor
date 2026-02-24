@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package lite_monitor;
+
+message MonitorData {
+    int32 id = 1;
+    string item = 3;
+    oneof value {
+        string string_value = 4;
+        int64 int_value = 5;
+        double double_value = 6;
+    }
+    int64 timestamp = 7;
+}
+
+message ReportMessage {
+    string message_type = 1;
+    string host = 2;
+    repeated MonitorData data = 3;
+}
+
+

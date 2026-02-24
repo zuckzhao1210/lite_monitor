@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package lite_monitor;
+
+// 定义采集类型枚举
+enum CollectType {
+    UNKNOWN = 0;
+    PREDEFINED = 1;     // Predefined
+    USER_PARAMTER = 2;  // UserParamter
+    HTTP_AGENT = 3;     // HTTP agent
+}
+
+message Item {
+    string name = 1;
+    string data_type = 2;     // 建议使用下划线命名法，符合 Protobuf 风格
+    CollectType collect_type = 3; 
+}
+
+message ResponseItems {
+    string message_type = 1;
+    repeated Item items = 2;
+}
